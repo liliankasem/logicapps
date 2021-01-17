@@ -5,6 +5,8 @@ variables:
   value: deploy_artifacts
 - name: devEnvironment
   value: dev
+# TODO: You can remove this. Only in place for the sample AzDO pipeline.
+- group: azure_subscription
 
 stages:
 - stage: Builds

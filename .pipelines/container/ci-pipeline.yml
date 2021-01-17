@@ -9,6 +9,8 @@ variables:
   value: $(System.DefaultWorkingDirectory)
 - template: variables/vars-iac.yml
 - template: variables/vars-ci.yml
+# TODO: You can remove this. Only in place for the sample AzDO pipeline.
+- group: azure_subscription
 
 jobs:
 - job: logic_app_build

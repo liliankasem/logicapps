@@ -5,9 +5,8 @@ variables:
   projectName: 'logicappsample'
   suffix: 'devw'
 
-  # TODO: Fill in with your Azure subscription Id and the name of your service connection
-  subscriptionId: ''
-  devServiceConnection: ''
+  # TODO: Fill in with the name of your Azure service connection
+  # devServiceConnection: ''
 
   resourceGroupLocation: 'westus'
   resourceGroupName: 'rg-wus-$(projectName)-$(suffix)'

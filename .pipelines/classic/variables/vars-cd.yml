@@ -1,7 +1,0 @@
-# CD pipeline variables
-
-variables:
-
-  # Logic App appSettings parameters
-  # TODO: provide an email for the ExampleWorkflow to send mail to
-  toEmailAddress: ''

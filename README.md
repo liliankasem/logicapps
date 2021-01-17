@@ -2,6 +2,32 @@
 
 This repository contains a sample Logic App v2 project, with Azure deployment and pipeline examples.
 
+- [Logic Apps v2](#logic-apps-v2)
+  - [Prerequisites](#prerequisites)
+  - [Local](#local)
+    - [API Connections](#api-connections)
+    - [VS Code](#vs-code)
+    - [Docker](#docker)
+  - [DevOps](#devops)
+    - [ARM Deployment](#arm-deployment)
+    - [Azure Pipelines](#azure-pipelines)
+      - [IaC Pipeline](#iac-pipeline)
+      - [PR Pipeline](#pr-pipeline)
+      - [CI Pipeline](#ci-pipeline)
+      - [CD Pipeline](#cd-pipeline)
+    - [Pipeline Variables](#pipeline-variables)
+      - [Variable Files](#variable-files)
+  - [Known Issues & Limitations](#known-issues--limitations)
+    - [Q & A](#q--a)
+
+## Prerequisites
+
+- Azure Subscription
+- [Azure Storage Account or Emulator](https://docs.microsoft.com/azure/logic-apps/create-stateful-stateless-workflows-visual-studio-code#storage-requirements)
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [Visual Studio Tools](https://docs.microsoft.com/azure/logic-apps/create-stateful-stateless-workflows-visual-studio-code#tools)
+- [ARM Outputs Azure DevOps Task](https://marketplace.visualstudio.com/items?itemName=keesschollaart.arm-outputs)
+
 ## Local
 
 To run the project locally, you can follow the [documentation provided by the Logic Apps team](https://docs.microsoft.com/azure/logic-apps/create-stateful-stateless-workflows-visual-studio-code#run-test-and-debug-locally).
@@ -156,22 +182,25 @@ For both the classic and container deployment approach, you will need to supply 
 
 #### Variable Files
 
-Under the `variables/` folder, you will need to fill in some variables:
+Under the `variables/` folder & in some pipeline files, you will need to fill in some variables:
 
 ```yml
 # vars-iac
-subscriptionId: 'YOUR AZURE SUBSCRIPTION ID'
 devServiceConnection: 'NAME OF AZURE SERVICE CONNECTION IN AZURE DEVOPS'
 
 # vars-ci
-projectId: 'NAME OR ID OF AZURE DEVOPS PROJECT'
-iacPipelineDefinitionId: 'ID OF THE IAC PIPELINE in AZURE DEVOPS'
+projectId: 'ID OF AZURE DEVOPS PROJECT'
+iacPipelineDefinitionId: 'ID OF THE IAC PIPELINE IN AZURE DEVOPS'
 
-# vars-cd
+# cd-pipeline
 toEmailAddress: 'EMAIL ADDRESS THE EXAMPLE WORKFLOW SHOULD EMAIL'
 ```
 
-You will need need to create a service connection for your Azure subscription for many of the pipeline tasks to work. [Follow this documentation to create your service connection](https://docs.microsoft.com/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml).
+> NOTE: You can search for `TODO` to find all the values you need to replace.
+
+You will need need to create a service connection for your Azure subscription for many of the pipeline tasks to work. [Follow this documentation to create your service connection](https://docs.microsoft.com/azure/devops/pipelines/library/connect-to-azure?view=azure-devops).
+
+> The `azure_subscription` variable group can be removed if you clone this repo. It is being used to hold all the variables that we need to fill in to make the sample Azure DevOps pipeline run.
 
 ## Known Issues & Limitations
 

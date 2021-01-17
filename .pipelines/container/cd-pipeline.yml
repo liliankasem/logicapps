@@ -3,10 +3,16 @@ trigger: none
 variables:
 - name: devEnvironment
   value: dev
+# TODO: provide an email for the ExampleWorkflow to send mail to
+# - name: toEmailAddress
+#   value: ''
+# TODO: You can remove this. Only in place for the sample AzDO pipeline.
+- group: azure_subscription
 
 resources:
   pipelines:
   - pipeline: ciPipeline
+    # TODO: Update with the name of your CI pipeline
     source: 'Container - CI'
     trigger:
       branches:
@@ -17,7 +23,6 @@ stages:
   displayName: 'DEV Deployment'
   variables:
   - template: variables/vars-iac.yml
-  - template: variables/vars-cd.yml
   jobs:
   - deployment: deploy_logicapp_resources
     displayName: Deploy Logic App
@@ -36,4 +41,4 @@ stages:
               azureSubscription: $(devServiceConnection)
               appName: '$(logicAppName)'
               imageName: '$(acrName).azurecr.io/$(logicAppContainerName):$(resources.pipeline.ciPipeline.RunId)'
-              appsettings: '-emailAddress $(toEmailAddress) -iotTopic $(topic) -iotMessageSubject $(iotMessageSubject) -iotHubPath $(iotHubPath)'
+              appsettings: '-emailAddress $(toEmailAddress)'
