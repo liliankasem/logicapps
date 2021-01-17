@@ -1,0 +1,16 @@
+{
+  "managedApiConnections": {
+    "office365": {
+      "api": {
+        "id": "{office365ConnectionManagedApiId}"
+      },
+      "connection": {
+        "id": "{office365ConnectionId}"
+      },
+      "connectionRuntimeUrl": "{office365RuntimeConnectionUrl}",
+      "authentication": {
+        "type": "ManagedServiceIdentity"
+      }
+    }
+  }
+}

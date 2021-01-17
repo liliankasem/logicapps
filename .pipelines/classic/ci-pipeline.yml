@@ -1,0 +1,44 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-18.04'
+
+variables:
+- name: workingDirectory
+  value: $(System.DefaultWorkingDirectory)
+- template: variables/vars-ci.yml
+
+jobs:
+- job: logic_app_build
+  displayName: 'Build and publish logic app'
+  steps:
+  - task: DownloadPipelineArtifact@2
+    displayName: 'Download connector deployment output file'
+    inputs:
+      source: 'specific'
+      project: '$(projectId)'
+      definition: '$(iacPipelineDefinitionId)'
+      runVersion: 'latest'
+      targetPath: '$(Pipeline.Workspace)'
+
+  - task: PowerShell@2
+    displayName: 'Populate connections.json file with parameters'
+    inputs:
+      filePath: '$(workingDirectory)/.pipelines/scripts/Configure-Connections.ps1'
+      arguments: '-armOutputFilePath $(Pipeline.Workspace)/$(logicAppIacOutputArtifactName)/$(connectorOutputFileName)
+      -connectionsFilePath connections.devops.json
+      -outputLocation connections.json'
+
+  - template: templates/template-build-logicapp.yml
+    parameters:
+      workingDirectory: $(workingDirectory)
+      configuration: Release
+      outputFolder: $(publishOutputFolder)
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish pipeline artifact'
+    inputs:
+      targetPath: '$(workingDirectory)/$(publishOutputFolder)'
+      artifact: '$(logicAppCIArtifactName)'
+      publishLocation: 'pipeline'
