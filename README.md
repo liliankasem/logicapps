@@ -1,5 +1,7 @@
 # Logic Apps v2
 
+[![Build Status](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_apis/build/status/classic/Classic%20-%20CI?branchName=main)](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_build/latest?definitionId=3&branchName=main)
+
 This repository contains a sample Logic App v2 project, with Azure deployment and pipeline examples.
 
 - [Logic Apps v2](#logic-apps-v2)
@@ -120,6 +122,8 @@ Once your application is running:
 > NOTE: When using docker, I have noticed that the `host.json` is not created until a request is made to the logic app. So if you don't see a new folder with a `host.json` file, try just making a call to `listCallbackUrl` URl above without the master key then check your storage account again.
 
 ## DevOps
+
+You can view a sample of this project's deployment in [Azure DevOps](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_build?view=folders).
 
 ### ARM Deployment
 
