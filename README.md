@@ -36,7 +36,8 @@ To run the project locally, you can follow the [documentation provided by the Lo
 
 ### API Connections
 
-This project uses the office 365 API connection. For you to run this project, you will need to generate a `connections.json` file. There are two ways you can do this, you can either create a new API connection, or connect to a pre-deployed connection (i.e. you have already created an API connection in Azure, through an IaC pipeline or otherwise).
+This project uses the office 365 API connection. For you to run this project, you will need to generate a `connections.json` file. There are two ways you can do this,
+you can either create a new API connection, or connect to a pre-deployed connection (i.e. you have already created an API connection in Azure, through an IaC pipeline or otherwise).
 
 If you want to use a pre-deployed connection, provide the following variables in your `local.settings.json`:
 
@@ -63,9 +64,11 @@ Follow these steps:
 8. Click `Sign in` and follow the process to authenticate the office 365 connection
 9. Make sure to hit `Save`
 
-Once complete, a `connection.json` file will be generated for you, and the `local.settings.json` should be updated to contain the key for the office365 connection. If you provided the the workflow variables mentioned above, the Logic App should connect to a pre-existing connection instead of creating a new one. You can always go back into the designer and change the connection.
+Once complete, a `connection.json` file will be generated for you, and the `local.settings.json` should be updated to contain the key for the office365 connection. If you provided the
+workflow variables mentioned above, the Logic App should connect to a pre-existing connection instead of creating a new one. You can always go back into the designer and change the connection.
 
-> NOTE: When you recreate the `Send an email` action, the parameter used for the to address will be removed. If you want to parameterize this value, update the `workflow.json` file so that it uses app settings for the email address `To": "@appsetting('emailAddress')"`
+> NOTE: When you recreate the `Send an email` action, the parameter used for the to address will be removed. If you want to parameterize this value, update the `workflow.json` file so that
+> it uses app settings for the email address `To": "@appsetting('emailAddress')"`
 
 ### VS Code
 
@@ -119,7 +122,8 @@ Once your application is running:
 
 - You can then use the workflow URL to trigger your Logic App
 
-> NOTE: When using docker, I have noticed that the `host.json` is not created until a request is made to the logic app. So if you don't see a new folder with a `host.json` file, try just making a call to `listCallbackUrl` URl above without the master key then check your storage account again.
+> NOTE: When using docker, I have noticed that the `host.json` (inside the storage account) is not created until a request is made to the logic app. So if you don't see a new folder with
+> a `host.json` file, try just making a call to `listCallbackUrl` URl above without the master key then check your storage account again.
 
 ## DevOps
 
@@ -145,7 +149,7 @@ The `.deploy` folder contains the ARM templates required to deploy all the requi
 
 ### Azure Pipelines
 
-The `.pipelines` folder contains examples of of how to deploy both the container version and the normal version of the logic app.
+The `.pipelines` folder contains examples of how to deploy both the container version and the normal version of the logic app.
 
 #### IaC Pipeline
 
@@ -153,7 +157,8 @@ The `.pipelines` folder contains examples of of how to deploy both the container
   - [Container version] also deploys ACR
 - Publishes artifact for the connections output file
 
-> Make sure you create and run this pipeline before any of the other pipelines. The CI pipeline need the Id of this pipeline to function.
+> Make sure you create and run this pipeline before any of the other pipelines. The CI pipeline needs the IaC pipeline to function as it will download the artifact that is published
+> in order to make the `connections.json` file.
 
 #### PR Pipeline
 
@@ -170,7 +175,7 @@ The `.pipelines` folder contains examples of of how to deploy both the container
   - Runs `dotnet publish` to generate zip of project
   - Publishes project zip as pipeline artifact
 - [Container version]
-  - Build and push docker file
+  - Build and push docker file to ACR
 
 #### CD Pipeline
 
@@ -178,11 +183,11 @@ The `.pipelines` folder contains examples of of how to deploy both the container
   - Download CI pipeline artifact containing project zip
   - Use the Azure Functions task to deploy the project
 - [Container version]
-  - Use the Azure Functions container task to deploy the project
+  - Use the Azure Functions container task to deploy the project (using the docker image that was published by the CI pipeline)
 
 ### Pipeline Variables
 
-For both the classic and container deployment approach, you will need to supply a set of variables to make the deployments possible
+For both the classic and container deployment approach, you will need to supply a set of variables to make the deployments possible.
 
 #### Variable Files
 
@@ -204,7 +209,8 @@ toEmailAddress: 'EMAIL ADDRESS THE EXAMPLE WORKFLOW SHOULD EMAIL'
 
 You will need need to create a service connection for your Azure subscription for many of the pipeline tasks to work. [Follow this documentation to create your service connection](https://docs.microsoft.com/azure/devops/pipelines/library/connect-to-azure?view=azure-devops).
 
-> The `azure_subscription` variable group can be removed if you clone this repo. It is being used to hold all the variables that we need to fill in to make the sample Azure DevOps pipeline run.
+> The `azure_subscription` variable group can be removed if you clone this repo. It is being used to hold all the variables that we need to fill in to make the sample Azure
+> DevOps pipeline run.
 
 ## Known Issues & Limitations
 
@@ -215,19 +221,23 @@ With Logic App v2 being in preview, there are some caveats to be aware of.
   - This works: `"someVariable": "@appsetting('exampleVariable')"`
   - This does *not* work: `"someVariable": "/subscriptions/@appsetting('subId')/resourceGroups/@appsetting('resourceGroup')/"`
 
-- Similar to the note about the connections file, you also cannot parameterize the `workflow.json` file (you are enable to do entire variables and not partial like the example above).
-  - Something worth noting: whilst I was able to use an app settings parameter for the email address in the ExampleWorkflow, when trying to do the same for items in the Event Grid trigger action (such as the topic, path and filter properties) - that did not work.
+- Similar to the note about the connections file, you also cannot parameterize the `workflow.json` file (you are able to do entire variables, but not partial like the example above).
+  - Something worth noting: whilst I was able to use an app settings parameter for the email address in the ExampleWorkflow, when trying to do the same for items in the Event Grid trigger
+    action (such as the topic, path and filter properties) - that did not work.
 
 - [Azurite](https://github.com/Azure/Azurite) is not yet supported.
 
-- There is currently a bug where generating a new `connections.json` file will update `.csproj` with another entry for the connections file, feel free to delete this new reference - you do not need to reference the connections file more than once.
+- There is currently a bug where generating a new `connections.json` file will update `.csproj` with another entry for the connections file, feel free to delete this new reference - you
+  do not need to reference the connections file more than once.
 
 ### Q & A
 
 Q: Why do I have to recreate the action that uses the API connection?
 
-- A: Currently, whilst Logic Apps v2 is in preview, the designer does not allow you to select or create a new connection when a `connections.json` file does not already exist, the only way around this is to recreate the action that uses the connection.
+- A: Currently, whilst Logic Apps v2 is in preview, the designer does not allow you to select or create a new connection when a `connections.json` file does not already exist, the only way
+  around this is to recreate the action that uses the connection.
 
 Q: Why do I need to get a connection key to run locally?
 
-- A: When running logic apps locally, the connection needs to use the 'Raw' authentication method for connections to work. When deploying to Azure, the authentication method eds to be `ManagedServiceIdentity`, this is why we have a tokenized `connections.devops.json` file that we use in our DevOps pipelines to deploy our logic app.
+- A: When running logic apps locally, the connection needs to use the 'Raw' authentication method for connections to work. When deploying to Azure, the authentication method needs to be `ManagedServiceIdentity`,
+  this is why we have a tokenized `connections.devops.json` file that we use in our DevOps pipelines to deploy our logic app.
