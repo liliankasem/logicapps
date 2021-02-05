@@ -34,6 +34,19 @@ param(
   $withFunctions
 )
 
+Function RegisterRP {
+  <#
+      .SYNOPSIS
+          Register the Azure resource provider.
+  #>
+  Param(
+    [Parameter(Mandatory = $True, HelpMessage = "The name of the resource provider to register")]
+    [string]$ResourceProviderNamespace
+  )
+  Write-Host "Registering resource provider '$ResourceProviderNamespace'";
+  Register-AzResourceProvider -ProviderNamespace $ResourceProviderNamespace;
+}
+
 Function Get-ConnectionsFile {
   <#
       .SYNOPSIS
@@ -130,5 +143,14 @@ Function Get-FunctionConnections {
 
 # Fix the PSScriptRoot value for older versions of PowerShell
 if (!$PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
+
+# Register resource providers used by the deployment
+$resourceProviders = @("microsoft.logic");
+if ($resourceProviders.length) {
+  Write-Host "Registering resource providers"
+  foreach ($resourceProvider in $resourceProviders) {
+    RegisterRP($resourceProvider);
+  }
+}
 
 Get-ConnectionsFile

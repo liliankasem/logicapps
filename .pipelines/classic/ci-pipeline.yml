@@ -8,6 +8,7 @@ variables:
 - name: workingDirectory
   value: $(System.DefaultWorkingDirectory)
 - template: variables/vars-ci.yml
+- template: variables/vars-iac.yml
 
 jobs:
 - job: logic_app_build
