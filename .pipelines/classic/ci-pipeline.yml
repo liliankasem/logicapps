@@ -11,16 +11,24 @@ variables:
   value: $(System.DefaultWorkingDirectory)
 - template: variables/vars-ci.yml
 - template: variables/vars-iac.yml
+# TODO: You can remove this. Only in place for the sample AzDO pipeline.
+- group: azure_subscription
 
 jobs:
 - job: logic_app_build
   displayName: 'Build and publish logic app'
   steps:
-  - task: PowerShell@2
+  - task: AzurePowerShell@4
     displayName: 'Generate connections.json file'
     inputs:
-      filePath: '$(workingDirectory)/.pipelines/scripts/Generate-Connections.ps1'
-      arguments: '-resourceGroup $(resourceGroupName)'
+      azureSubscription: $(devServiceConnection)
+      ScriptType: 'FilePath'
+      ScriptPath: '$(workingDirectory)/.pipelines/scripts/Generate-Connections.ps1'
+      FailOnStandardError: true
+      azurePowerShellVersion: LatestVersion
+      pwsh: true
+      ScriptArguments: >-
+        -resourceGroup $(resourceGroupName)
 
   - template: templates/template-build-logicapp.yml
     parameters:
