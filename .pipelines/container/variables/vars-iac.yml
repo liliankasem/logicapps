@@ -24,4 +24,4 @@ variables:
   logicAppContainerName: '$(projectName)'
 
   # API Connections
-  officeConnectionName: 'la-wus-$(projectName)-connection-office365-$(suffix)'
+  officeConnectionName: 'la-wus-$(projectName)-connection-office365'
