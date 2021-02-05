@@ -83,7 +83,6 @@ jobs:
               -logicAppSystemAssignedIdentityTenantId $(logicAppSystemAssignedIdentityTenantId)
               -logicAppSystemAssignedIdentityObjectId $(logicAppSystemAssignedIdentityObjectId)'
             deploymentMode: $(deploymentMode)
-            deploymentOutputs: 'ConnectorsArmOutputs'
 
         - task: Bash@3
           displayName: 'USER ACTION: Authorize Office365 API Connection'
@@ -91,15 +90,3 @@ jobs:
             targetType: 'inline'
             script: |
               echo 'Please manually authorize the office 365 api connection that was just created.'
-
-        - task: Bash@3
-          displayName: 'Save connector outputs to file'
-          inputs:
-            targetType: 'inline'
-            script: echo '$(ConnectorsArmOutputs)' >> $(connectorOutputFileName)
-
-        - task: PublishPipelineArtifact@1
-          displayName: 'Publish Artifact'
-          inputs:
-            targetPath: $(connectorOutputFileName)
-            artifactName: $(logicAppIacOutputArtifactName)

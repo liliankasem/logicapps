@@ -155,10 +155,6 @@ The `.pipelines` folder contains examples of how to deploy both the container ve
 
 - Deploys the logic app and API connections
   - [Container version] also deploys ACR
-- Publishes artifact for the connections output file
-
-> Make sure you create and run this pipeline before any of the other pipelines. The CI pipeline needs the IaC pipeline to function as it will download the artifact that is published
-> in order to make the `connections.json` file.
 
 #### PR Pipeline
 
@@ -169,19 +165,18 @@ The `.pipelines` folder contains examples of how to deploy both the container ve
 
 #### CI Pipeline
 
-- Downloads the API connections output file that was published by the IaC pipeline
-- Uses the `.pipelines/scripts/Configure-Connections.ps1` script to replace the tokens in the `connections.devops.json` file to generate a `connections.json` file
+- Uses the `.pipelines/scripts/Generate-Connections.ps1` script to generate a `connections.json` file
 - [Classic version]
   - Runs `dotnet publish` to generate zip of project
   - Publishes project zip as pipeline artifact
 - [Container version]
   - Build and push docker file to ACR
 
-> #### Decouple the CI pipeline from IaC
+> #### Note on `Generate-Connections.ps1`
 >
-> Instead of publishing the ARM output for the connections in your IaC pipeline, you can use the `.pipelines/scripts/Generate-Connections.ps1` script
-> which will generate a `connections.json` file using all the API connections deployed to a resource group. This way you can decouple the CI pipeline from the IaC pipeline.
-> However, the `Generate-Connections.ps1` does *not* work for function app connectors.
+> - If you are using the script with the `-withFunctions` flag, you must have the
+> [Azure Functions Core Tools](https://docs.microsoft.com/azure/azure-functions/functions-run-local?tabs=linux%2Ccsharp%2Cbash#install-the-azure-functions-core-tools) installed.
+> - All of the connections you want to include in your `connections.json` file must be in the same resource group
 
 #### CD Pipeline
 
@@ -213,7 +208,8 @@ toEmailAddress: 'EMAIL ADDRESS THE EXAMPLE WORKFLOW SHOULD EMAIL'
 
 > NOTE: You can search for `TODO` to find all the values you need to replace.
 
-You will need need to create a service connection for your Azure subscription for many of the pipeline tasks to work. [Follow this documentation to create your service connection](https://docs.microsoft.com/azure/devops/pipelines/library/connect-to-azure?view=azure-devops).
+You will need need to create a service connection for your Azure subscription for many of the pipeline tasks to work.
+[Follow this documentation to create your service connection](https://docs.microsoft.com/azure/devops/pipelines/library/connect-to-azure?view=azure-devops).
 
 > The `azure_subscription` variable group can be removed if you clone this repo. It is being used to hold all the variables that we need to fill in to make the sample Azure
 > DevOps pipeline run.
