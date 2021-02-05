@@ -177,6 +177,12 @@ The `.pipelines` folder contains examples of how to deploy both the container ve
 - [Container version]
   - Build and push docker file to ACR
 
+> #### Decouple the CI pipeline from IaC
+>
+> Instead of publishing the ARM output for the connections in your IaC pipeline, you can use the `.pipelines/scripts/Generate-Connections.ps1` script
+> which will generate a `connections.json` file using all the API connections deployed to a resource group. This way you can decouple the CI pipeline from the IaC pipeline.
+> However, the `Generate-Connections.ps1` does *not* work for function app connectors.
+
 #### CD Pipeline
 
 - [Classic version]
