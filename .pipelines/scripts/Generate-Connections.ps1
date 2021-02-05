@@ -1,3 +1,7 @@
+# Make sure you have connected your Azure account and set context to the subscription you want to use:
+# 1) Connect-AzAccount
+# 2) Set-AzContext -Subscription <subscription-id-here>
+
 <#
     .SYNOPSIS
         Generate a connections json file using API connections already deployed to a resource group.
@@ -130,6 +134,5 @@ Function Get-FunctionConnections {
 
 # Fix the PSScriptRoot value for older versions of PowerShell
 if (!$PSScriptRoot) { $PSScriptRoot = Split-Path $MyInvocation.MyCommand.Path -Parent }
-
 
 Get-ConnectionsFile
