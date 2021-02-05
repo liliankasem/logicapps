@@ -7,9 +7,9 @@ This repository contains a sample Logic App v2 project, with Azure deployment an
 - [Logic Apps v2](#logic-apps-v2)
   - [Prerequisites](#prerequisites)
   - [Local](#local)
-    - [API Connections](#api-connections)
     - [VS Code](#vs-code)
     - [Docker](#docker)
+    - [API Connections](#api-connections)
   - [DevOps](#devops)
     - [ARM Deployment](#arm-deployment)
     - [Azure Pipelines](#azure-pipelines)
@@ -35,42 +35,6 @@ This repository contains a sample Logic App v2 project, with Azure deployment an
 ## Local
 
 To run the project locally, you can follow the [documentation provided by the Logic Apps team](https://docs.microsoft.com/azure/logic-apps/create-stateful-stateless-workflows-visual-studio-code#run-test-and-debug-locally).
-
-### API Connections
-
-This project uses the office 365 API connection. For you to run this project, you will need to generate a `connections.json` file. There are two ways you can do this,
-you can either create a new API connection, or connect to a pre-deployed connection (i.e. you have already created an API connection in Azure, through an IaC pipeline or otherwise).
-
-If you want to use a pre-deployed connection, provide the following variables in your `local.settings.json`:
-
-> Read more about why you have to recreate the action [here](#known-issues--limitations).
-
-```json
-"WORKFLOWS_TENANT_ID": "",
-"WORKFLOWS_SUBSCRIPTION_ID": "",
-"WORKFLOWS_RESOURCE_GROUP_NAME": "",
-"WORKFLOWS_LOCATION_NAME": "",
-```
-
-If you want to create a new connection, the above values will get populated for you when you create the connection in the designer.
-
-Follow these steps:
-
-1. Right-click on the `workflow.json` file (inside ExampleWorkflow/ folder)
-2. Click `Open in designer`
-3. Right-click on the office operation and click `Delete`
-4. Add a new step
-5. Select the Azure tab and search for `office365`
-6. Select the `Office 365 Outlook` and search for `send email`
-7. Select the `Send an email (V2)` action
-8. Click `Sign in` and follow the process to authenticate the office 365 connection
-9. Make sure to hit `Save`
-
-Once complete, a `connection.json` file will be generated for you, and the `local.settings.json` should be updated to contain the key for the office365 connection. If you provided the
-workflow variables mentioned above, the Logic App should connect to a pre-existing connection instead of creating a new one. You can always go back into the designer and change the connection.
-
-> NOTE: When you recreate the `Send an email` action, the parameter used for the to address will be removed. If you want to parameterize this value, update the `workflow.json` file so that
-> it uses app settings for the email address `To": "@appsetting('emailAddress')"`
 
 ### VS Code
 
@@ -127,9 +91,44 @@ Once your application is running:
 > NOTE: When using docker, I have noticed that the `host.json` (inside the storage account) is not created until a request is made to the logic app. So if you don't see a new folder with
 > a `host.json` file, try just making a call to `listCallbackUrl` URl above without the master key then check your storage account again.
 
+### API Connections
+
+This project uses the office 365 API connection. For you to run this project, you will need to generate a `connections.json` file. There are two ways you can do this,
+you can either create a new API connection, or connect to a pre-deployed connection (i.e. you have already created an API connection in Azure, through an IaC pipeline or otherwise).
+
+If you want to use a pre-deployed connection, provide the following variables in your `local.settings.json`, this is so that the designer can pick up the existing connections from Azure.
+If you want to create a new connection, these values will get populated for you when you create the connection in the designer.
+
+> Read more about why you have to recreate the action [here](#known-issues--limitations).
+
+```json
+"WORKFLOWS_TENANT_ID": "",
+"WORKFLOWS_SUBSCRIPTION_ID": "",
+"WORKFLOWS_RESOURCE_GROUP_NAME": "",
+"WORKFLOWS_LOCATION_NAME": "",
+```
+
+To get the `connections.json` file generated for you, for both the new and existing connectors, follow these steps:
+
+1. Right-click on the `workflow.json` file (inside ExampleWorkflow/ folder)
+2. Click `Open in designer`
+3. Right-click on the office operation and click `Delete`
+4. Add a new step
+5. Select the Azure tab and search for `office365`
+6. Select the `Office 365 Outlook` and search for `send email`
+7. Select the `Send an email (V2)` action
+8. Click `Sign in` and follow the process to authenticate the office 365 connection
+9. Make sure to hit `Save`
+
+Once complete, a `connection.json` file will be generated, and the `local.settings.json` file should be updated to contain the key for the office365 connection. If you provided the
+workflow variables mentioned above, the Logic App should connect to a pre-existing connection instead of creating a new one. You can always go back into the designer and change the connection.
+
+> NOTE: When you recreate the `Send an email` action, the parameter used for the "To" address" will be removed. If you want to parameterize this value, update the `workflow.json` file so that
+> it uses app settings for the email address `To": "@appsetting('emailAddress')"`
+
 ## DevOps
 
-You can view a sample of this project's deployment in [Azure DevOps](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_build?view=folders).
+You can view a sample of this project's pipelines in [Azure DevOps](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_build?view=folders).
 
 ### ARM Deployment
 
