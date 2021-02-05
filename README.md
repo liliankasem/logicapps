@@ -24,11 +24,13 @@ This repository contains a sample Logic App v2 project, with Azure deployment an
 
 ## Prerequisites
 
-- Azure Subscription
+- [Azure Subscription](https://azure.microsoft.com/free)
 - [Azure Storage Account or Emulator](https://docs.microsoft.com/azure/logic-apps/create-stateful-stateless-workflows-visual-studio-code#storage-requirements)
 - [Visual Studio Code](https://code.visualstudio.com/)
-- [Visual Studio Tools](https://docs.microsoft.com/azure/logic-apps/create-stateful-stateless-workflows-visual-studio-code#tools)
+- [Logic App Tools List](https://docs.microsoft.com/azure/logic-apps/create-stateful-stateless-workflows-visual-studio-code#tools)
 - [ARM Outputs Azure DevOps Task](https://marketplace.visualstudio.com/items?itemName=keesschollaart.arm-outputs)
+- [Powershell v7](https://docs.microsoft.com/powershell/scripting/install/installing-powershell?view=powershell-7.1)
+  - [Azure Powershell Module](https://docs.microsoft.com/powershell/azure/install-az-ps?view=azps-5.4.0#install-the-azure-powershell-module)
 
 ## Local
 
@@ -56,7 +58,7 @@ Follow these steps:
 
 1. Right-click on the `workflow.json` file (inside ExampleWorkflow/ folder)
 2. Click `Open in designer`
-3. Right-click on the office365 connection and click `Delete`
+3. Right-click on the office operation and click `Delete`
 4. Add a new step
 5. Select the Azure tab and search for `office365`
 6. Select the `Office 365 Outlook` and search for `send email`
@@ -177,6 +179,7 @@ The `.pipelines` folder contains examples of how to deploy both the container ve
 > - If you are using the script with the `-withFunctions` flag, you must have the
 > [Azure Functions Core Tools](https://docs.microsoft.com/azure/azure-functions/functions-run-local?tabs=linux%2Ccsharp%2Cbash#install-the-azure-functions-core-tools) installed.
 > - All of the connections you want to include in your `connections.json` file must be in the same resource group
+> - This script generates the `connections.json` for deployment, not for local use. This is because we set the auth type to `ManagedServiceIdentity` ([read more here](#q--a))
 
 #### CD Pipeline
 
@@ -241,5 +244,4 @@ Q: Why do I have to recreate the action that uses the API connection?
 
 Q: Why do I need to get a connection key to run locally?
 
-- A: When running logic apps locally, the connection needs to use the 'Raw' authentication method for connections to work. When deploying to Azure, the authentication method needs to be `ManagedServiceIdentity`,
-  this is why we have a tokenized `connections.devops.json` file that we use in our DevOps pipelines to deploy our logic app.
+- A: When running logic apps locally, the connection needs to use the 'Raw' authentication method for connections to work. When deploying to Azure, the authentication method needs to be `ManagedServiceIdentity`.
