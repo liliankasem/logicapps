@@ -47,7 +47,7 @@ Function Get-ConnectionsFile {
     $functionConnections = (Get-FunctionConnections) ?? @{}
   }
 
-  $json = $withFunctions ? @{ "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections } : @{ "managedApiConnection" = $apiConnections; }
+  $json = $withFunctions ? @{ "managedApiConnections" = $apiConnections; "functionConnections" = $functionConnections } : @{ "managedApiConnections" = $apiConnections; }
   $json = ConvertTo-Json $json -Depth 5 -Compress
   $json = [Regex]::Replace($json, "\\u[a-zA-Z0-9]{4}", { param($u) [Regex]::Unescape($u) })
   $json | Set-Content -Path $outputLocation
