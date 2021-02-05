@@ -1,6 +1,8 @@
 trigger:
 - main
 
+pr: none
+
 pool:
   vmImage: 'ubuntu-18.04'
 
@@ -8,27 +10,25 @@ variables:
 - name: workingDirectory
   value: $(System.DefaultWorkingDirectory)
 - template: variables/vars-ci.yml
+- template: variables/vars-iac.yml
+# TODO: You can remove this. Only in place for the sample AzDO pipeline.
+- group: azure_subscription
 
 jobs:
 - job: logic_app_build
   displayName: 'Build and publish logic app'
   steps:
-  - task: DownloadPipelineArtifact@2
-    displayName: 'Download connector deployment output file'
+  - task: AzurePowerShell@4
+    displayName: 'Generate connections.json file'
     inputs:
-      source: 'specific'
-      project: '$(projectId)'
-      definition: '$(iacPipelineDefinitionId)'
-      runVersion: 'latest'
-      targetPath: '$(Pipeline.Workspace)'
-
-  - task: PowerShell@2
-    displayName: 'Populate connections.json file with parameters'
-    inputs:
-      filePath: '$(workingDirectory)/.pipelines/scripts/Configure-Connections.ps1'
-      arguments: '-armOutputFilePath $(Pipeline.Workspace)/$(logicAppIacOutputArtifactName)/$(connectorOutputFileName)
-      -connectionsFilePath connections.devops.json
-      -outputLocation connections.json'
+      azureSubscription: $(devServiceConnection)
+      ScriptType: 'FilePath'
+      ScriptPath: '$(workingDirectory)/.pipelines/scripts/Generate-Connections.ps1'
+      FailOnStandardError: true
+      azurePowerShellVersion: LatestVersion
+      pwsh: true
+      ScriptArguments: >-
+        -resourceGroup $(resourceGroupName)
 
   - template: templates/template-build-logicapp.yml
     parameters:
