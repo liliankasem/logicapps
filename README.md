@@ -10,6 +10,8 @@ This repository contains a sample Logic App v2 project, with Azure deployment an
     - [VS Code](#vs-code)
     - [Docker](#docker)
     - [API Connections](#api-connections)
+      - [Recreate the operation using the connection](#recreate-the-operation-using-the-connection)
+      - [Create a new workflow just for connections](#create-a-new-workflow-just-for-connections)
   - [DevOps](#devops)
     - [ARM Deployment](#arm-deployment)
     - [Azure Pipelines](#azure-pipelines)
@@ -88,8 +90,8 @@ Once your application is running:
 
 - You can then use the workflow URL to trigger your Logic App
 
-> NOTE: When using docker, I have noticed that the `host.json` (inside the storage account) is not created until a request is made to the logic app. So if you don't see a new folder with
-> a `host.json` file, try just making a call to `listCallbackUrl` URl above without the master key then check your storage account again.
+> NOTE: When using docker, I have noticed that the `host.json` (inside the storage account) is not created until a request is made to the logic app.
+> So if you don't see a new folder with a `host.json` file, try just making a call to `listCallbackUrl` URl above without the master key then check your storage account again.
 
 ### API Connections
 
@@ -99,7 +101,7 @@ you can either create a new API connection, or connect to a pre-deployed connect
 If you want to use a pre-deployed connection, provide the following variables in your `local.settings.json`, this is so that the designer can pick up the existing connections from Azure.
 If you want to create a new connection, these values will get populated for you when you create the connection in the designer.
 
-> Read more about why you have to recreate the action [here](#known-issues--limitations).
+> Read more about why you have to recreate the operation [here](#known-issues--limitations).
 
 ```json
 "WORKFLOWS_TENANT_ID": "",
@@ -108,23 +110,43 @@ If you want to create a new connection, these values will get populated for you 
 "WORKFLOWS_LOCATION_NAME": "",
 ```
 
-To get the `connections.json` file generated for you, for both the new and existing connectors, follow these steps:
+To get the `connections.json` file generated for you, for both the new and existing connectors, you have two options:
+
+#### Recreate the operation using the connection
+
+This approach is where you would delete and recreate operations using your connector in your project workflow file, for example:
 
 1. Right-click on the `workflow.json` file (inside ExampleWorkflow/ folder)
-2. Click `Open in designer`
-3. Right-click on the office operation and click `Delete`
-4. Add a new step
-5. Select the Azure tab and search for `office365`
-6. Select the `Office 365 Outlook` and search for `send email`
-7. Select the `Send an email (V2)` action
-8. Click `Sign in` and follow the process to authenticate the office 365 connection
-9. Make sure to hit `Save`
+1. Click `Open in designer`
+1. Right-click on the office operation and click `Delete`
+1. Add a new step
+1. Select the Azure tab and search for `office365`
+1. Select the `Office 365 Outlook` and search for `send email`
+1. Select the `Send an email (V2)` operation
+1. Click `Sign in` and follow the process to authenticate the office 365 connection
+1. Make sure to hit `Save`
 
-Once complete, a `connection.json` file will be generated, and the `local.settings.json` file should be updated to contain the key for the office365 connection. If you provided the
-workflow variables mentioned above, the Logic App should connect to a pre-existing connection instead of creating a new one. You can always go back into the designer and change the connection.
-
-> NOTE: When you recreate the `Send an email` action, the parameter used for the "To" address" will be removed. If you want to parameterize this value, update the `workflow.json` file so that
+> NOTE: If you recreate the `Send an email` operation, the parameter used for the "To" address" will be removed. If you want to parameterize this value, update the `workflow.json` file so that
 > it uses app settings for the email address `To": "@appsetting('emailAddress')"`
+
+#### Create a new workflow just for connections
+
+This approach uses another workflow as a resource for creating connections so that you don't have to recreate operations in your main project workflow, for example:
+
+1. Use the Logic App extension to create a new workflow
+   - `shift+cmd+p` -> `Azure Logic Apps: Create Workflow...`
+1. Select `Stateful`
+1. Name the workflow `ConnectionsGenerator`
+1. Right-click on the `workflow.json` file (inside ConnectionsGenerator/ folder)
+1. Click `Open in designer`
+1. Create the operation that uses the connection you want to generate
+   - Similar to [steps 4 to 9 above](#recreate-the-operation-using-the-connection)
+1. Now that the `connections.json` file has been created for you, you can just update your real workflow file
+   to reference the connection. For example with `ExampleWorkflow`, you would update `host.connection.referenceName`
+   to match the name of the connection that was created inside the `connections.json` file.
+
+After you complete either one of the above steps, a `connection.json` file will be generated and the `local.settings.json` file should be updated to contain the key for the office365 connection.
+If you provided the workflow variables mentioned above, the Logic App should connect to a pre-existing connection instead of creating a new one. You can always go back into the designer and change the connection.
 
 ## DevOps
 
@@ -220,26 +242,48 @@ You will need need to create a service connection for your Azure subscription fo
 
 With Logic App v2 being in preview, there are some caveats to be aware of.
 
-- You cannot parameterize values inside the `connection.json` file. You can replace an entire variable with an app settings parameter, but you cannot parameterize parts of a string. For example:
+- [**Connections**] You cannot parameterize values inside the `connection.json` file. You can replace an entire variable with an `appsetting` parameter, but you cannot parameterize parts of a string. For example:
 
   - This works: `"someVariable": "@appsetting('exampleVariable')"`
-  - This does *not* work: `"someVariable": "/subscriptions/@appsetting('subId')/resourceGroups/@appsetting('resourceGroup')/"`
+  - This *does **not*** work: `"someVariable": "/subscriptions/@{appsetting('subId')}/resourceGroups/@{appsetting('resourceGroup')}/"`
 
-- Similar to the note about the connections file, you also cannot parameterize the `workflow.json` file (you are able to do entire variables, but not partial like the example above).
-  - Something worth noting: whilst I was able to use an app settings parameter for the email address in the ExampleWorkflow, when trying to do the same for items in the Event Grid trigger
-    action (such as the topic, path and filter properties) - that did not work.
+- [**Workflow**] Parameters are not yet supported inside the `workflow.json` file, but you can use `appsetting` instead. For example:
+
+  - `"someVariable": "myPrefix-@{appsetting('example')}"` || `"someVariable": "@appsetting('example')"`
+
+> NOTE: this *does **not*** work with `path` properties inside the workflow file, values for this property must be hardcoded for now. For example, the path property when you create an event grid trigger:
+>
+>```json
+>   "When_a_resource_event_occurs": {
+>       "type": "ApiConnectionWebhook",
+>       "inputs": {
+>           "host": {
+>               "connection": {
+>                   "referenceName": "azureeventgrid"
+>               }
+>           },
+>           "body": { . . . },
+>           "path": "THIS VALUE HAS TO BE HARD CODED",
+>       },
+>       "splitOn": "@triggerBody()"
+>   }
+>```
 
 - [Azurite](https://github.com/Azure/Azurite) is not yet supported.
 
 - There is currently a bug where generating a new `connections.json` file will update `.csproj` with another entry for the connections file, feel free to delete this new reference - you
   do not need to reference the connections file more than once.
 
+- There is currently a bug where you cannot view Azure operations in the designer when using a stateless workflow
+
+- Authentication is not yet supported using the built-in HTTP operation
+
 ### Q & A
 
-Q: Why do I have to recreate the action that uses the API connection?
+Q: Why do I have to recreate the operation that uses the API connection?
 
 - A: Currently, whilst Logic Apps v2 is in preview, the designer does not allow you to select or create a new connection when a `connections.json` file does not already exist, the only way
-  around this is to recreate the action that uses the connection.
+  around this is to recreate the operation that uses the connection, or create any operation that uses that connection inside a new workflow file.
 
 Q: Why do I need to get a connection key to run locally?
 
