@@ -4,6 +4,8 @@
 
 ## For the latest version of this sample, please refer to [Azure Logic App templates](https://github.com/Azure/logicapps/tree/master/azure-devops-sample) <!-- omit in toc -->
 
+> If you're working with the **nuget/csproj version** of Logic Apps, you can revert to the following commit in this repo to view the pipeline examples: `5fe7d12f52aa8e0ba08fb785f0a7dd174dd56ed6`
+
 This repository contains a sample Logic App (single-tenant) project, with Azure deployment and pipeline examples.
 
 - [Logic Apps (Single-tenant)](#logic-apps-single-tenant)
