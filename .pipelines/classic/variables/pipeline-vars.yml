@@ -2,7 +2,7 @@
 
 variables:
 
-  projectName: 'logicappsample'
+  projectName: 'logicappexample'
   suffix: 'devw'
 
   # TODO: Fill in with the name of your Azure service connection
