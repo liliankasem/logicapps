@@ -3,17 +3,14 @@
 variables:
 
   projectName: 'logicappsample'
-  suffix: 'devc'
+  suffix: 'devw'
 
   # TODO: Fill in with the name of your Azure service connection
   # devServiceConnection: ''
 
+  # Resource Group
   resourceGroupLocation: 'westus'
   resourceGroupName: 'rg-wus-$(projectName)-$(suffix)'
-
-  # ACR
-  acrName: 'acrwus$(projectName)$(suffix)'
-  acrSkuName: 'Basic'
 
   # Storage
   storageName: 'sa$(projectName)$(suffix)'
@@ -21,7 +18,9 @@ variables:
 
   #  Logic App
   logicAppName: 'la-wus-$(projectName)-$(suffix)'
-  logicAppContainerName: '$(projectName)'
 
   # API Connections
   officeConnectionName: 'la-wus-$(projectName)-connection-office365'
+
+  # Project artifacts
+  logicAppCIArtifactName: 'logicapp_publish_artifact'

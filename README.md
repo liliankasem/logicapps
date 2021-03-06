@@ -1,13 +1,12 @@
-# Logic Apps v2
+# Logic Apps (Single-tenant)
 
 [![Build Status](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_apis/build/status/classic/Classic%20-%20CI?branchName=main)](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_build/latest?definitionId=3&branchName=main)
 
-## For the latest version of this sample, please refer to [Azure Logic App templates](https://github.com/Azure/logicapps/tree/master/azure-devops-sample)
+## For the latest version of this sample, please refer to [Azure Logic App templates](https://github.com/Azure/logicapps/tree/master/azure-devops-sample) <!-- omit in toc -->
 
-This repository contains a sample Logic App v2 project, with Azure deployment and pipeline examples.
+This repository contains a sample Logic App (single-tenant) project, with Azure deployment and pipeline examples.
 
-- [Logic Apps v2](#logic-apps-v2)
-  - [For the latest version of this sample, please refer to Azure Logic App templates](#for-the-latest-version-of-this-sample-please-refer-to-azure-logic-app-templates)
+- [Logic Apps (Single-tenant)](#logic-apps-single-tenant)
   - [Prerequisites](#prerequisites)
   - [Local](#local)
     - [VS Code](#vs-code)
@@ -19,7 +18,6 @@ This repository contains a sample Logic App v2 project, with Azure deployment an
     - [ARM Deployment](#arm-deployment)
     - [Azure Pipelines](#azure-pipelines)
       - [IaC Pipeline](#iac-pipeline)
-      - [PR Pipeline](#pr-pipeline)
       - [CI Pipeline](#ci-pipeline)
       - [CD Pipeline](#cd-pipeline)
     - [Pipeline Variables](#pipeline-variables)
@@ -50,15 +48,13 @@ To run the project locally, you can follow the [documentation provided by the Lo
   {
     "IsEncrypted": false,
     "Values": {
-      "FUNCTIONS_WORKER_RUNTIME": "dotnet",
-      "AzureWebJobsStorage": "",
-      "emailAddress": "",
-      "office365-connectionKey": ""
+      "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+      "FUNCTIONS_WORKER_RUNTIME": "node",
+      "FUNCTIONS_V2_COMPATIBILITY_MODE": "true",
+      "emailAddress": ""
     }
   }
   ```
-
-  > You should be able to get the `office365-connectionKey` value by creating the API connection as explained [here](#api-connections).
 
 - Navigate to the `Run` tab and hit the play icon to run the application
 - Right-click on the `workflow.json` file and click `Overview`
@@ -137,7 +133,7 @@ This approach is where you would delete and recreate operations using your conne
 This approach uses another workflow as a resource for creating connections so that you don't have to recreate operations in your main project workflow, for example:
 
 1. Use the Logic App extension to create a new workflow
-   - `shift+cmd+p` -> `Azure Logic Apps: Create Workflow...`
+   - `cmd+shift+p` / `ctrl+shift+p` -> `Azure Logic Apps: Create Workflow...`
 1. Select `Stateful`
 1. Name the workflow `ConnectionsGenerator`
 1. Right-click on the `workflow.json` file (inside ConnectionsGenerator/ folder)
@@ -157,7 +153,7 @@ You can view a sample of this project's pipelines in [Azure DevOps](https://dev.
 
 ### ARM Deployment
 
-The `.deploy` folder contains the ARM templates required to deploy all the required logic app resources.
+The `deploy` folder contains the ARM templates required to deploy all the required logic app resources.
 
 - `connectors-template.json` deploys an office 365 connector
 - classic/
@@ -182,18 +178,11 @@ The `.pipelines` folder contains examples of how to deploy both the container ve
 - Deploys the logic app and API connections
   - [Container version] also deploys ACR
 
-#### PR Pipeline
-
-- [Classic version] Use dotnet task to build project
-- [Container version] Build docker image
-
-> Ideally, you also run unit tests here
-
 #### CI Pipeline
 
 - Uses the `.pipelines/scripts/Generate-Connections.ps1` script to generate a `connections.json` file
 - [Classic version]
-  - Runs `dotnet publish` to generate zip of project
+  - Create a zip of the project
   - Publishes project zip as pipeline artifact
 - [Container version]
   - Build and push docker file to ACR
@@ -222,20 +211,18 @@ For both the classic and container deployment approach, you will need to supply 
 Under the `variables/` folder & in some pipeline files, you will need to fill in some variables:
 
 ```yml
-# vars-iac
+# pipeline-vars.yml
 devServiceConnection: 'NAME OF AZURE SERVICE CONNECTION IN AZURE DEVOPS'
 
-# cd-pipeline
+# cd-pipeline.yaml
 toEmailAddress: 'EMAIL ADDRESS THE EXAMPLE WORKFLOW SHOULD EMAIL'
+resources.pipelines.pipeline.source: 'NAME OF THE CI PIPELINE IN AZURE DEVOPS'
 ```
 
 > NOTE: You can search for `TODO` to find all the values you need to replace.
 
 You will need need to create a service connection for your Azure subscription for many of the pipeline tasks to work.
 [Follow this documentation to create your service connection](https://docs.microsoft.com/azure/devops/pipelines/library/connect-to-azure?view=azure-devops).
-
-> The `azure_subscription` variable group can be removed if you clone this repo. It is being used to hold all the variables that we need to fill in to make the sample Azure
-> DevOps pipeline run.
 
 ## Known Issues & Limitations
 
@@ -269,9 +256,6 @@ With Logic App v2 being in preview, there are some caveats to be aware of.
 >```
 
 - [Azurite](https://github.com/Azure/Azurite) is not yet supported.
-
-- There is currently a bug where generating a new `connections.json` file will update `.csproj` with another entry for the connections file, feel free to delete this new reference - you
-  do not need to reference the connections file more than once.
 
 - There is currently a bug where you cannot view Azure operations in the designer when using a stateless workflow
 
