@@ -2,7 +2,7 @@
 
 [![Build Status](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_apis/build/status/classic/Classic%20-%20CI?branchName=main)](https://dev.azure.com/logicappsdemo/Logic%20Apps%20v2%20Sample/_build/latest?definitionId=3&branchName=main)
 
-## For the latest version of this sample, please refer to [Azure Logic App templates](https://github.com/Azure/logicapps/tree/master/templates/devops-sample)
+## For the latest version of this sample, please refer to [Azure Logic App templates](https://github.com/Azure/logicapps/tree/master/azure-devops-sample)
 
 This repository contains a sample Logic App v2 project, with Azure deployment and pipeline examples.
 
