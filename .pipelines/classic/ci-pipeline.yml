@@ -35,7 +35,7 @@ jobs:
         host.json
         proxies.json
         connections.json
-        ExampleWorkflow
+        ExampleWorkflow/**
       TargetFolder: 'project_output'
 
   - task: ArchiveFiles@2
